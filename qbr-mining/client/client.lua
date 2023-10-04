@@ -211,45 +211,27 @@ end)
 RegisterNetEvent('rb94-mine')
 AddEventHandler('rb94-mine', function()
 	exports['qbr-core']:TriggerCallback('QBCore:HasItem', function(hasItem) 
-		if miningactive == false then
-			if hasItem and miningactive == false then
+		if hasItem then
+            local player = PlayerPedId()
+			
+			SetCurrentPedWeapon(player, `WEAPON_UNARMED`, true)
 				
-				miningactive = true
+			TaskStartScenarioInPlace(PlayerPedId(), GetHashKey('WORLD_HUMAN_PICKAXE_WALL'), 0, true, false, false, false)
 				
-				local player = PlayerPedId()
-				SetCurrentPedWeapon(player, `WEAPON_UNARMED`, true)
-				
-				TaskStartScenarioInPlace(PlayerPedId(), GetHashKey('WORLD_HUMAN_PICKAXE_WALL'), 0, true, false, false, false)
-				
-				Citizen.Wait(500)
-				local lock = exports['qbr-lock']:StartLockPickCircle(5,50) 
-
-				if lock then 
-				    ClearPedTasks(player)
+			exports['qbr-core']:Progressbar("majning", "Mining", 30000, false, true, {
+					disableMovement = false,
+					disableCarMovement = false,
+					disableMouse = false,
+					disableCombat = true,
+				}, {}, {}, {}, function()
+					ClearPedTasks(player)
 				    miningactive = false
 			        TriggerServerEvent('rb94-mineRew')
 					SetCurrentPedWeapon(player, `WEAPON_UNARMED`, true)
 				
-                   
-				else
-                    randomNumber = math.random(1,100)
-					
-					if randomNumber > 65 then
-						TriggerServerEvent('QBCore:Server:RemoveItem', "pickaxe", 1)
-						TriggerEvent("inventory:client:ItemBox", sharedItems["pickaxe"], "remove")
-						exports['qbr-core']:Notify(9, 'your pickaxe is broken', 5000, 0, 'mp_lobby_textures', 'cross', 'COLOR_WHITE')
-					end
-					
-					ClearPedTasks(player)
-				    miningactive = false
-					SetCurrentPedWeapon(player, `WEAPON_UNARMED`, true)
-					exports['qbr-core']:Notify(9, 'Swing your pickaxe better next time!', 5000, 0, 'mp_lobby_textures', 'cross', 'COLOR_WHITE')
-                end
-			else
-				exports['qbr-core']:Notify(9, 'you don\'t have a pickaxe!', 5000, 0, 'mp_lobby_textures', 'cross', 'COLOR_WHITE')
-			end
+			end)
 		else
-			exports['qbr-core']:Notify(9, 'you are already mining!', 5000, 0, 'mp_lobby_textures', 'cross', 'COLOR_WHITE')
+			exports['qbr-core']:Notify(9, 'you don\'t have a pickaxe!', 5000, 0, 'mp_lobby_textures', 'cross', 'COLOR_WHITE')
 		end
 	end, { ['pickaxe'] = 1 })
 end)
